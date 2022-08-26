@@ -68,8 +68,7 @@ end
 
 function SetInBhop(bool)
     local local_char = GetLocalCharacter()
-    --and not local_char:IsInRagdollMode()
-    if ((bool and local_char  and not local_char:GetVehicle()) or not bool) then
+    if ((bool and local_char and not local_char:GetVehicle() and not local_char:IsInRagdollMode()) or not bool) then
         InBhop = bool
         JustJumped = false
         Events.Call("BhopModeChanged", bool)
@@ -127,6 +126,7 @@ Client.Subscribe("Tick", function(delta_time)
         local speed_xy = vel_only_xy:Size()
         if Bhop_Debug then
             Client.DrawDebugLine(char:GetLocation(), char:GetLocation() + dir * 100, Color.GREEN, delta_time * Debug_Line_Time_Mult, 1)
+            DebugInfo.Delta_Time = tostring(delta_time)
         end
 
         local keys_down = {
@@ -197,7 +197,13 @@ Client.Subscribe("Tick", function(delta_time)
             end
 
             if dot_product_move_vel < 0 then
-                VelToSet = VelToSet + (speed_xy * rotated_move_wish * Old_Speed_Kept) + (speed_xy * dir * (1-Old_Speed_Kept))
+                local new_old_speed_kept = Old_Speed_Kept * delta_time * Speed_Force_To_Move_Wish_Delta_Time_Mult
+                DebugInfo.Old_Speed_Kept = new_old_speed_kept
+                if new_old_speed_kept > 1 then
+                    new_old_speed_kept = 1
+                end
+
+                VelToSet = VelToSet + (speed_xy * rotated_move_wish * new_old_speed_kept) + (speed_xy * dir * (1-new_old_speed_kept))
                 SetCharVelocity(Vector(VelToSet.X, VelToSet.Y, vel.Z))
             end
         end
