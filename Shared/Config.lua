@@ -1,6 +1,6 @@
 
 
-Bhop_Debug = true
+Bhop_Debug = false
 Debug_Line_Time_Mult = 1.2
 
 Bhop_Dot_Product_To_Gain_Speed = 0.12
